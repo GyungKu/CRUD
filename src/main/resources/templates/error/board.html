@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+  <div>
+    <ul>
+      <li>
+        <a href="home.html">홈</a>
+      </li>
+      <li>
+        <a href="board.html">게시판</a>
+      </li>
+      <li th:if="${member == null}">
+        <a href="login.html">로그인</a>
+      </li>
+    </ul>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>번호</th>
+        <th>제목</th>
+        <th>작성자</th>
+        <th>조회수</th>
+        <th>시간</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1</td>
+        <td>안녕</td>
+        <td>spring</td>
+        <td>10</td>
+        <td>2023-06-16</td>
+      </tr>
+      <tr>
+        <td>1</td>
+        <td><a href="post.html">안녕</a></td>
+        <td>spring</td>
+        <td>10</td>
+        <td>2023-06-16</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div>
+    <form>
+      <select name="field">
+        <option value="writerId">작성자</option>
+        <option value="title">제목</option>
+      </select>
+      <input type="text" name="query" value="">
+      <input type="submit" value="검색">
+    </form>
+    <button onclick="location.href='addForm.html'">등록</button>
+  </div>
+
+  <nav>
+    <ul th:with="start=${p-(p-1)%5}, end=${start+4}, last=${7}">
+      <li th:if="${start > 1}">
+        <a th:text="'<'" th:href="@{/ff(p=${start-5}, field=${param.field}, query=${param.query})}" />
+      </li>
+
+      <li th:each="page : ${#numbers.sequence(start, end)}" th:if="${page <= last &amp;&amp; start>=1}">
+        <a th:text="${page}" th:href="@{/ff(p=${page}, field=${param.field}, query=${param.query})}" />
+      </li>
+
+      <li th:if="${end<last}">
+        <a th:text="'>'" th:href="@{/ff(p=${start+5}, field=${param.field}, query=${param.query})}" />
+      </li>
+    </ul>
+  </nav>
+<div>
+  <p th:if="${p != null}" th:field="${p}"></p>
+</div>
+
+</body>
+</html>

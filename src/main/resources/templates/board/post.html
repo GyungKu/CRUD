@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title th:text="${post.title}"></title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+  <style>
+        .signNav {
+            float: right;
+            margin-right: 50px;
+        }
+        .contentNav {
+            text-align: center;
+            clear: both;
+        }
+        .mb-3 {
+          width: 40%;
+          margin: auto;
+        }
+        .stats {
+          border: 1px solid;
+          width: 40%;
+          margin: auto;
+          text-align: center;
+          margin-bottom: 30px;
+        }
+        .stat {
+          border: 1px solid;
+        }
+        .createBtn {
+          margin: auto;
+          text-align: center;
+        }
+        .pagination {
+          width: 40%;
+          margin: auto;
+        }
+        .table {
+          width: 60%;
+          margin: auto;
+          margin-bottom: 30px;
+        }
+        .comment {
+           width: 60%;
+          margin: auto;
+          margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+
+<!--Header-->
+<div class="btn-group btn-group-sm signNav" role="group" aria-label="Small button group">
+  <ul class="nav">
+    <li class="nav-item" th:if="${member == null}">
+      <a class="nav-link" href="members/loginForm.html" th:href="|@{/members/login}|">로그인</a>
+    </li>
+    <li class="nav-item" th:if="${member == null}">
+      <a class="nav-link" href="members/joinForm.html" th:href="|@{/members/join}|">회원가입</a>
+    </li>
+    <li class="nav-item" th:if="${member != null}">
+      <a class="nav-link" href="members/myPage.html" th:href="@{|/members/${member.id}|}" th:text="${member.userId}">사용자ID</a>
+    </li>
+  </ul>
+  <!--  <ol class="breadcrumb">-->
+  <!--    <li class="breadcrumb-item active" aria-current="page" th:if="${member != null}"-->
+  <!--        th:text="${member.userId}">사용자 ID</li>-->
+  <!--  </ol>-->
+  <div th:if="${member != null}">
+    <form action="/logout" method="post">
+      <input type="submit" value="로그아웃">
+    </form>
+  </div>
+</div>
+
+
+<nav class="navbar navbar-expand-lg bg-light contentNav">
+  <div class="container-fluid">
+    <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link" aria-current="page" href="home.html" th:href="@{/}">메인</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="board/board.html" th:href="@{/board}">게시판</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="members/loginForm.html.html" th:if="${member == null}" th:href="@{|/members/login|}">마이페이지</a>
+          <a class="nav-link" href="members/myPage.html" th:if="${member != null}" th:href="@{|/members/${member.id}|}">마이페이지</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+<!--Header End-->
+  <div class="stats">
+    <tr >
+      <td th:text="|작성자 ${post.userId} /|">작성자</td>
+      <td th:text="|조회수 ${post.views} /|">조회수</td>
+      <td th:text="|추천수 ${post.likeCount}|">추천수</td>
+    </tr>
+    <tr>
+      <p th:text="|작성일 ${#temporals.format(post.creationDate, 'yyyy-MM-dd hh:mm')}|">작성일</p>
+    </tr>
+  </div>
+<div class="mb-3">
+  <label for="exampleFormControlInput1" class="form-label">제목</label>
+  <input class="form-control" id="exampleFormControlInput1" th:field="${post.title}" readonly>
+</div>
+<div class="mb-3">
+  <label for="exampleFormControlTextarea1" class="form-label">내용</label>
+  <textarea class="form-control" id="exampleFormControlTextarea1" rows="8" th:field="${post.content}" readonly></textarea>
+</div>
+<div class="createBtn" th:if="${member.userId eq post.userId}">
+  <a class="btn btn-primary" href="#" th:href="@{|/board/edit/${postId}|}" role="button">수정</a>
+  <a class="btn btn-primary" href="#" th:href="@{|/board/delete/${postId}|}" role="button">삭제</a>
+</div>
+<div class="createBtn">
+  <a class="btn btn-primary" href="#" th:if="${!hasLike}" th:href="@{|/board/like/${postId}|}" role="button">추천</a>
+  <a class="btn btn-primary" href="#" th:if="${hasLike}" th:href="@{|/board/unLike/${postId}|}" role="button">추천취소</a>
+</div>
+
+
+<table class="table align-middle">
+  <thead>
+  <tr>
+    <th scope="col">작성자</th>
+    <th scope="col">내용</th>
+    <th scope="col">작성일</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr th:each="comment : ${comments}">
+    <th scope="row" th:text="${comment.userId}">작성자</th>
+    <td th:text="${comment.content}">내용</td>
+    <td th:text="${#temporals.format(comment.creationDate, 'yyyy-MM-dd hh:mm')}">작성일</td>
+    <td th:if="${comment.userId == member.userId}">
+      <a class="btn btn-primary" href="#" th:href="@{|/board/comment/delete/${comment.id}|}" role="button">삭제</a>
+    </td>
+  </tr>
+  </tbody>
+</table>
+
+<nav aria-label="Page navigation example">
+  <ul class="pagination justify-content-center" th:with="p=${pages.getNumber+1}, start=${p-(p-1)%5}, end=${start+4}, last=${pages.getTotalPages}">
+    <li class="page-item" th:if="${start > 5}">
+      <a class="page-link" th:href="@{|/board/${postId}?p=${start-5}|}">이전</a>
+    </li>
+    <li class="page-item" th:each="page : ${#numbers.sequence(start, end)}" th:if="${page <= last &amp;&amp; start>=0}">
+      <a class="page-link " th:text="${page}" href="#" th:href="@{|/board/${postId}?p=${page}|}" th:classappend="${p == page} ? active : ''">1</a>
+    </li>
+    <li class="page-item" th:if="${end < last}">
+      <a class="page-link" href="#" th:href="@{|/board/${postId}?p=${start+5}|}">다음</a>
+    </li>
+  </ul>
+</nav>
+
+<form method="post" class="comment">
+  <div>
+    <div th:errors="${form.content}"></div>
+    <input class="form-control form-control-lg" placeholder="댓글입력" th:field="${form.content}">
+    <input class="btn btn-primary" type="submit" value="등록">
+  </div>
+</form>g
+
+</body>
+
+</html>
