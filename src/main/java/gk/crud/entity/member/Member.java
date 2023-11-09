@@ -38,4 +38,8 @@ public class Member {
         this.password = password;
         this.name = name;
     }
+
+    public void passwordEncode(String password) {
+        this.password = password;
+    }
 }

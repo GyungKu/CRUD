@@ -3,6 +3,7 @@ package gk.crud.service;
 import gk.crud.entity.member.Member;
 import gk.crud.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -10,9 +11,11 @@ import org.springframework.stereotype.Service;
 public class MemberServiceImpl implements MemberService{
 
     private final MemberRepository memberRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public Member join(Member member) {
+        member.passwordEncode(passwordEncoder.encode(member.getPassword()));
         memberRepository.save(member);
         return member;
     }
@@ -32,10 +35,8 @@ public class MemberServiceImpl implements MemberService{
     @Override
     public Member login(String userId, String password) {
         Member member = findByUserId(userId);
-        if(member != null && member.getPassword().equals(password)) {
-            return member;
-        }
-        return null;
+        validPassword(password, member.getPassword());
+        return member;
     }
 
     @Override
@@ -45,5 +46,11 @@ public class MemberServiceImpl implements MemberService{
             return true;
         }
         return false;
+    }
+
+    public void validPassword(String input, String realPassword) {
+        if (!passwordEncoder.matches(input, realPassword)) {
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
     }
 }
